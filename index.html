@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViralFlow AI</title>
+    <title>ViralFlow AI Pro</title>
     <style>
-        :root { --accent: #8b5cf6; --dark: #0f172a; --light: #f8fafc; }
-        body { font-family: sans-serif; background: var(--light); padding: 20px; display: flex; justify-content: center; }
-        .app-card { background: white; max-width: 500px; width: 100%; border-radius: 24px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 20px; }
-        textarea { width: 100%; border: 2px solid #f1f5f9; border-radius: 12px; padding: 15px; box-sizing: border-box; }
+        :root { --accent: #8b5cf6; --dark: #0f172a; --light: #f8fafc; --success: #22c55e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); padding: 20px; display: flex; justify-content: center; }
+        .app-card { background: white; max-width: 500px; width: 100%; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+        .header h1 { text-align: center; color: var(--dark); margin-bottom: 5px; font-size: 28px; }
+        .header p { text-align: center; color: #64748b; margin-bottom: 25px; }
+        textarea { width: 100%; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        textarea:focus { border-color: var(--accent); }
         .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-        .tool-btn { background: #f1f5f9; border: none; padding: 10px; border-radius: 10px; cursor: pointer; }
-        #generate-btn { width: 100%; background: var(--dark); color: white; border: none; padding: 15px; border-radius: 12px; cursor: pointer; font-size: 16px; }
-        .output-section { margin-top: 20px; display: none; }
-        .hook-item { background: #f5f3ff; border-left: 4px solid var(--accent); padding: 10px; margin-bottom: 10px; border-radius: 5px; position: relative; }
-        .copy-btn { position: absolute; right: 5px; top: 5px; font-size: 10px; cursor: pointer; background: white; border: 1px solid #ddd; padding: 2px 5px; }
+        .tool-btn { background: #f1f5f9; border: 2px solid transparent; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; color: #475569; }
+        .tool-btn.active { border-color: var(--accent); background: #f5f3ff; color: var(--accent); }
+        #generate-btn { width: 100%; background: var(--dark); color: white; border: none; padding: 16px; border-radius: 15px; cursor: pointer; font-size: 18px; font-weight: bold; transition: 0.2s; }
+        #generate-btn:active { transform: scale(0.98); }
+        .output-section { margin-top: 25px; display: none; }
+        .hook-item { background: white; border: 1px solid #e2e8f0; padding: 15px; margin-bottom: 15px; border-radius: 12px; position: relative; transition: 0.3s; }
+        .hook-item:hover { border-color: var(--accent); box-shadow: 0 5px 15px rgba(139, 92, 246, 0.1); }
+        .score-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+        .score-high { background: #dcfce7; color: #166534; }
+        .copy-btn { position: absolute; right: 15px; bottom: 15px; background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .text-content { font-size: 15px; line-height: 1.5; color: #1e293b; padding-right: 50px; }
     </style>
 </head>
 <body>
@@ -23,25 +31,33 @@
 <div class="app-card">
     <div class="header">
         <h1>ViralFlow AI 🚀</h1>
-        <p>Turn your ideas into viral gold.</p>
+        <p>Analyze & Generate Viral Hooks</p>
     </div>
 
-    <textarea id="topic" rows="3" placeholder="Enter your topic (e.g. Solar panels, YouTube growth)"></textarea>
+    <textarea id="topic" rows="3" placeholder="Enter your video topic..."></textarea>
 
     <div class="tools-grid">
-        <button class="tool-btn">🪝 Viral Hooks</button>
-        <button class="tool-btn">📜 Script</button>
+        <button id="btnHooks" class="tool-btn active" onclick="setMode('hooks')">🪝 Viral Hooks</button>
+        <button id="btnScript" class="tool-btn" onclick="setMode('script')">📜 Short Script</button>
     </div>
 
-    <button id="generate-btn" onclick="startGenerating()">Generate Viral Magic</button>
+    <button id="generate-btn" onclick="startGenerating()">Generate & Score Magic</button>
 
     <div class="output-section" id="output">
-        <h3>Results:</h3>
+        <h3 style="color: var(--dark);">Optimization Results:</h3>
         <div id="results-container"></div>
     </div>
 </div>
 
 <script>
+    let currentMode = 'hooks';
+
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btnHooks').classList.toggle('active', mode === 'hooks');
+        document.getElementById('btnScript').classList.toggle('active', mode === 'script');
+    }
+
     function startGenerating() {
         const topic = document.getElementById('topic').value;
         if(!topic) return alert("Please enter a topic!");
@@ -49,24 +65,49 @@
         const container = document.getElementById('results-container');
         document.getElementById('output').style.display = "block";
         
-        const viralHooks = [
-            `"The secret to ${topic} that 99% of people missed!"`,
-            `"Stop doing ${topic} the old way! Do this instead."`,
-            `"I tried ${topic} for 30 days. Here is what happened..."`,
-            `"Why nobody is talking about this ${topic} hack?"`
-        ];
+        let results = [];
+        if(currentMode === 'hooks') {
+            results = [
+                { text: `"The secret to ${topic} that 99% of people missed!"`, score: 98 },
+                { text: `"Stop doing ${topic} the old way! Do this instead."`, score: 92 },
+                { text: `"I analyzed 100 viral videos about ${topic}, here's why they worked."`, score: 87 },
+                { text: `"Why nobody is talking about this ${topic} hack?"`, score: 81 }
+            ];
+        } else {
+            results = [
+                { text: `[Hook]: Stop scrolling! Did you know about ${topic}?\n[Value]: Most people fail at ${topic} because of one mistake...\n[CTA]: Follow for more!`, score: 95 }
+            ];
+        }
 
-        container.innerHTML = viralHooks.map(hook => `
+        container.innerHTML = results.map(item => `
             <div class="hook-item">
-                <span class="copy-btn" onclick="copyMe('${hook}')">Copy</span>
-                ${hook}
+                <div class="score-badge score-high">Viral Score: ${item.score}/100</div>
+                <div class="text-content">${item.text}</div>
+                <button class="copy-btn" onclick="copyMe(this)">Copy</button>
             </div>
         `).join('');
     }
 
-    function copyMe(text) {
-        navigator.clipboard.writeText(text);
-        alert("Copied!");
+    async function copyMe(btn) {
+        const text = btn.previousElementSibling.innerText;
+        try {
+            await navigator.clipboard.writeText(text);
+            btn.innerText = "Copied!";
+            btn.style.background = "#22c55e";
+            setTimeout(() => {
+                btn.innerText = "Copy";
+                btn.style.background = "#8b5cf6";
+            }, 2000);
+        } catch (err) {
+            // Backup copy method
+            const input = document.createElement('textarea');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            btn.innerText = "Copied!";
+        }
     }
 </script>
 
