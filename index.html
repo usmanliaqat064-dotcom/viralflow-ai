@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ViralFlow AI - Creator Tool</title>
+    <title>ViralFlow AI - Master Creator</title>
     <style>
         :root { --accent: #8b5cf6; --dark: #0f172a; --light: #f8fafc; }
-        body { font-family: sans-serif; background: var(--light); padding: 20px; display: flex; justify-content: center; }
-        .app-card { background: white; max-width: 500px; width: 100%; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 20px; }
-        textarea { width: 100%; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .tools-grid { display: flex; gap: 10px; margin: 20px 0; }
-        .tool-btn { flex: 1; background: #f1f5f9; border: 2px solid transparent; padding: 12px 5px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 12px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); padding: 20px; display: flex; justify-content: center; }
+        .app-card { background: white; max-width: 550px; width: 100%; border-radius: 24px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 25px; }
+        textarea { width: 100%; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        textarea:focus { border-color: var(--accent); }
+        .tools-grid { display: flex; gap: 8px; margin: 20px 0; }
+        .tool-btn { flex: 1; background: #f1f5f9; border: 2px solid transparent; padding: 12px 2px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.3s; }
         .tool-btn.active { border-color: var(--accent); background: #f5f3ff; color: var(--accent); }
         #generate-btn { width: 100%; background: var(--dark); color: white; border: none; padding: 16px; border-radius: 15px; cursor: pointer; font-size: 18px; font-weight: bold; }
         .output-section { margin-top: 25px; display: none; }
-        .hook-item { background: white; border: 1px solid #e2e8f0; padding: 15px; margin-bottom: 15px; border-radius: 12px; position: relative; }
-        .score-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: #dcfce7; color: #166534; margin-bottom: 8px; }
-        .copy-btn { position: absolute; right: 10px; top: 10px; background: var(--accent); color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
-        .text-content { font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+        .hook-item { background: white; border: 1px solid #e2e8f0; padding: 18px; margin-bottom: 15px; border-radius: 16px; position: relative; }
+        .score-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: #dcfce7; color: #166534; margin-bottom: 10px; }
+        .copy-btn { position: absolute; right: 15px; top: 15px; background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .text-content { font-size: 14px; line-height: 1.6; white-space: pre-wrap; color: #334155; }
     </style>
 </head>
 <body>
@@ -26,10 +27,10 @@
 <div class="app-card">
     <div class="header">
         <h1>ViralFlow AI 🚀</h1>
-        <p>Analyze & Generate Content</p>
+        <p>Analyze & Generate Viral Content</p>
     </div>
 
-    <textarea id="topic" rows="3" placeholder="Enter your topic..."></textarea>
+    <textarea id="topic" rows="3" placeholder="Enter your title (e.g. How a Billion Dollars Would Ruin Your Life)"></textarea>
 
     <div class="tools-grid">
         <button id="btnHooks" class="tool-btn active" onclick="setMode('hooks')">🪝 Viral Hooks</button>
@@ -37,69 +38,6 @@
         <button id="btnLong" class="tool-btn" onclick="setMode('long')">🎬 Master Script</button>
     </div>
 
-    <button id="generate-btn" onclick="startGenerating()">Generate Result</button>
+    <button id="generate-btn" onclick="startGenerating()">Generate & Analyze Magic</button>
 
-    <div class="output-section" id="output">
-        <div id="results-container"></div>
-    </div>
-</div>
-
-<script>
-    // Global variable to track mode
-    var currentMode = 'hooks';
-
-    function setMode(mode) {
-        currentMode = mode;
-        // Reset all buttons
-        document.getElementById('btnHooks').classList.remove('active');
-        document.getElementById('btnShort').classList.remove('active');
-        document.getElementById('btnLong').classList.remove('active');
-        
-        // Activate clicked button
-        if(mode === 'hooks') document.getElementById('btnHooks').classList.add('active');
-        if(mode === 'short') document.getElementById('btnShort').classList.add('active');
-        if(mode === 'long') document.getElementById('btnLong').classList.add('active');
-    }
-
-    function startGenerating() {
-        var topic = document.getElementById('topic').value;
-        if(!topic) {
-            alert("Please enter a topic!");
-            return;
-        }
-
-        document.getElementById('output').style.display = "block";
-        var container = document.getElementById('results-container');
-        var finalContent = "";
-        var score = 95;
-
-        if(currentMode === 'hooks') {
-            finalContent = "1. The secret to " + topic + " that 99% missed!\n2. Stop doing " + topic + " the old way!";
-        } else if(currentMode === 'short') {
-            finalContent = "[Hook]: Stop scrolling! Let's talk about " + topic + ".\n[Value]: Here is the secret...\n[CTA]: Follow for more!";
-        } else {
-            finalContent = "--- 20 MIN MASTER SCRIPT ---\nTopic: " + topic + "\n\n1. Introduction (2 min)\n2. The Core Problem (5 min)\n3. Step-by-Step Solution (10 min)\n4. Conclusion (3 min)";
-            score = 100;
-        }
-
-        container.innerHTML = '<div class="hook-item">' +
-            '<div class="score-badge">Viral Score: ' + score + '/100</div>' +
-            '<button class="copy-btn" onclick="copyMe()">Copy</button>' +
-            '<div id="textToCopy" class="text-content">' + finalContent + '</div>' +
-            '</div>';
-    }
-
-    function copyMe() {
-        var text = document.getElementById('textToCopy').innerText;
-        var input = document.createElement('textarea');
-        input.value = text;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-        alert("Copied to clipboard!");
-    }
-</script>
-
-</body>
-</html>
+    <div class="output
