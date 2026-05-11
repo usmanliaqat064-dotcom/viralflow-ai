@@ -61,29 +61,36 @@
     </div>
 </div>
 
-<script>
-    function selectTool(tool) {
-        alert(tool + " tool selected! Ready to generate.");
-    }
+function startGenerating() {
+    const topic = document.getElementById('topic').value;
+    if(!topic) return alert("Please enter an idea first!");
 
-    function startGenerating() {
-        const topic = document.getElementById('topic').value;
-        if(!topic) return alert("Please enter an idea first!");
+    const container = document.getElementById('results-container');
+    document.getElementById('output').style.display = "block";
+    
+    // وائرل مارکیٹنگ کے 5 بہترین فارمولے
+    const viralHooks = [
+        `"The secret to ${topic} that 99% of people missed in 2026..."`,
+        `"Stop doing ${topic} the old way! This 10-second hack changes everything."`,
+        `"I analyzed 100 viral videos about ${topic}, and they all have THIS in common."`,
+        `"You don't need a huge budget for ${topic}. You just need this simple strategy."`,
+        `"Warning: If you're still doing ${topic} like this, you're losing money!"`
+    ];
 
-        // Showing results (This will be connected to AI later)
-        document.getElementById('output').style.display = "block";
-        const container = document.getElementById('results-container');
-        container.innerHTML = `
-            <div class="hook-item">
-                <span class="copy-badge">Copy</span>
-                "The secret to [Topic] that 99% of people missed in 2026..."
-            </div>
-            <div class="hook-item">
-                <span class="copy-badge">Copy</span>
-                "I tried [Topic] for 30 days, and it changed everything. Here's how..."
-            </div>
-        `;
-    }
+    // رزلٹ کو اسکرین پر دکھانا
+    container.innerHTML = viralHooks.map(hook => `
+        <div class="hook-item">
+            <span class="copy-badge" onclick="copyText('${hook}')">Copy</span>
+            ${hook}
+        </div>
+    `).join('');
+}
+
+// کاپی کرنے کا فنکشن
+function copyText(text) {
+    navigator.clipboard.writeText(text);
+    alert("Hook copied to clipboard!");
+}
 </script>
 
 </body>
